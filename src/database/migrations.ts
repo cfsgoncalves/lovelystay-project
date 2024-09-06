@@ -4,7 +4,7 @@ import { logger } from '../utils/logger';
 
 export async function startMigrations() {
   if (
-    env.DATABASE === undefined ||
+    env.DB_NAME === undefined ||
     env.DB_USER === undefined ||
     env.DB_PASSWORD === undefined ||
     env.DB_HOST === undefined ||
@@ -14,7 +14,7 @@ export async function startMigrations() {
     return;
   }
   const dbConfig = {
-    database: env.DATABASE,
+    database: env.DB_NAME,
     user: env.DB_USER,
     password: env.DB_PASSWORD,
     host: env.DB_HOST,

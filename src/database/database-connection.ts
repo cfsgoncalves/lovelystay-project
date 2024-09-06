@@ -6,7 +6,8 @@ const dbConfig: any = {
         "port": parseInt(env.DB_PORT!),
         "database": env.DB_NAME,
         "user": env.DB_USER,
-        "password": env.DB_PASSWORD
+        "password": env.DB_PASSWORD,
+        "allowExitOnIdle": true
       };
 
 // Initializing the library:
