@@ -1,16 +1,22 @@
 import { db } from '../../database/database-connection';
+import { createProgrammingLanguageIfNotExists } from '../../database/programming-languages';
 import {
   createUser,
   getUserByUsername,
   getUserByLocation,
+  getAllUsers,
+  getUserByProgrammingLanguage,
 } from '../../database/user';
 
 describe('integration', () => {
-  describe('createUser', () => {
-    afterEach(() => {
-      db.none("DELETE FROM public.users WHERE username LIKE 'test%'");
-    });
+  beforeEach(async () => {
+    await db.none('TRUNCATE TABLE users RESTART IDENTITY CASCADE');
+    await db.none(
+      'TRUNCATE TABLE user_programming_languages RESTART IDENTITY CASCADE',
+    );
+  });
 
+  describe('createUser', () => {
     test('should create a user', async () => {
       const user = {
         username: 'test',
@@ -27,10 +33,64 @@ describe('integration', () => {
 
       expect(userDB).toEqual(user);
     });
+
+    test('should update a user', async () => {
+      const user = {
+        username: 'test',
+        profile_url: 'test',
+        location: 'test',
+        repos_url: 'test',
+        created_at: new Date(),
+      };
+
+      let result = await createUser(user);
+
+      expect(result).toEqual({ username: 'test' });
+
+      result = await createUser({ ...user, location: 'test2' });
+
+      expect(result).toEqual({ username: 'test' });
+
+      const userDB = await getUserByUsername('test');
+
+      expect(userDB).toEqual({ ...user, location: 'test2' });
+    });
   });
 
   describe('getUserByLocation', () => {
     test('should select a user by location', async () => {
+      const user = {
+        username: 'test3',
+        profile_url: 'test',
+        location: 'PT',
+        repos_url: 'test',
+        created_at: new Date(),
+      };
+
+      const user2 = {
+        username: 'test2',
+        profile_url: 'test',
+        location: 'ENG',
+        repos_url: 'test',
+        created_at: new Date(),
+      };
+
+      let result = await createUser(user);
+
+      expect(result).toEqual({ username: 'test3' });
+
+      result = await createUser(user2);
+
+      expect(result).toEqual({ username: 'test2' });
+
+      const usersDB = await getUserByLocation('PT');
+
+      expect(usersDB).toEqual([user]);
+    });
+  });
+
+  describe('getAllUsers', () => {
+    test('should select all users', async () => {
       const user = {
         username: 'test',
         profile_url: 'test',
@@ -55,42 +115,130 @@ describe('integration', () => {
 
       expect(result).toEqual({ username: 'test2' });
 
-      const usersDB = await getUserByLocation('PT');
+      const users = await getAllUsers();
 
-      expect(usersDB).toEqual([user]);
+      expect(users).toEqual([user, user2]);
+    });
+  });
+
+  describe('getUserByProgrammingLanguage', () => {
+    test('should select a user by programming language', async () => {
+      const user = {
+        username: 'test',
+        profile_url: 'test',
+        location: 'PT',
+        repos_url: 'test',
+        created_at: new Date(),
+      };
+
+      const user2 = {
+        username: 'test1',
+        profile_url: 'test',
+        location: 'ENG',
+        repos_url: 'test',
+        created_at: new Date(),
+      };
+
+      let result = await createUser(user);
+
+      expect(result).toEqual({ username: 'test' });
+
+      result = await createUser(user2);
+
+      expect(result).toEqual({ username: 'test1' });
+
+      const userProgrammingLanguage = [
+        {
+          username: 'test',
+          language_name: 'Java',
+        },
+        {
+          username: 'test',
+          language_name: 'Python',
+        },
+        {
+          username: 'test1',
+          language_name: 'Python',
+        },
+      ];
+
+      const value = await createProgrammingLanguageIfNotExists(
+        userProgrammingLanguage,
+      );
+
+      expect(value).toEqual(userProgrammingLanguage);
+
+      const users = await getUserByProgrammingLanguage('Java');
+
+      expect(users).toEqual([user]);
     });
   });
 });
 
 describe('unit', () => {
-  test('should create a user', async () => {
-    jest.spyOn(db, 'one').mockResolvedValue('test');
+  describe('createUser', () => {
+    test('should fail to create a user', async () => {
+      db.one = jest.fn().mockRejectedValue(new Error('Failed to create user'));
 
-    const user = {
-      username: 'test',
-      profile_url: 'test',
-      location: 'test',
-      repos_url: 'test',
-      created_at: new Date(),
-    };
-    const result = await createUser(user);
+      const user = {
+        username: 'test',
+        profile_url: 'test',
+        location: 'test',
+        repos_url: 'test',
+        created_at: new Date(),
+      };
 
-    expect(result).toEqual('test');
+      const result = await createUser(user);
+
+      expect(result).toEqual(new Error('Failed to create user'));
+    });
   });
 
-  test('should fail to create a user', async () => {
-    jest.spyOn(db, 'one').mockResolvedValue(new Error('Failed to create user'));
+  describe('getUserByUsername', () => {
+    test('should fail to get a user by username', async () => {
+      db.oneOrNone = jest
+        .fn()
+        .mockRejectedValue(new Error('Failed to get user'));
 
-    const user = {
-      username: 'test',
-      profile_url: 'test',
-      location: 'test',
-      repos_url: 'test',
-      created_at: new Date(),
-    };
+      const result = await getUserByUsername('test');
 
-    const result = await createUser(user);
+      expect(result).toEqual(new Error('Failed to get user'));
+    });
+  });
 
-    expect(result).toEqual(new Error('Failed to create user'));
+  describe('getUserByLocation', () => {
+    test('should fail to get users by location', async () => {
+      db.manyOrNone = jest
+        .fn()
+        .mockRejectedValue(new Error('Failed to get users'));
+
+      const result = await getUserByLocation('test');
+
+      expect(result).toEqual(new Error('Failed to get users'));
+    });
+  });
+
+  describe('getAllUsers', () => {
+    test('should fail to get all users', async () => {
+      db.manyOrNone = jest
+        .fn()
+        .mockRejectedValue(new Error('Failed to get users'));
+
+      const result = await getAllUsers();
+
+      expect(result).toEqual(new Error('Failed to get users from database'));
+    });
+  });
+
+  describe('getUserByProgrammingLanguage', () => {
+    test('should fail to get users by programming language', async () => {
+      db.manyOrNone = jest
+        .fn()
+        .mockRejectedValue(new Error('Failed to get users from database'));
+
+      const result = await getUserByProgrammingLanguage('test');
+
+      expect(result).toEqual(new Error('Failed to get users from database'));
+    });
   });
 });

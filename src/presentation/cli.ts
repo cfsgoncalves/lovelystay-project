@@ -26,8 +26,6 @@ export async function createCli(optionsValue?: OptionValues) {
 
   program.parse(process.argv);
 
-  console.log('Options Value: ' + JSON.stringify(program.opts()));
-
   if (!optionsValue) {
     options = program.opts();
   }

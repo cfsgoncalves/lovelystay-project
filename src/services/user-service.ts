@@ -20,6 +20,7 @@ export async function fetchUserFromGithub(
     new Date(Date.now() - TIME_TO_REFRESH) >=
     new Date((userFromDB as User)?.created_at);
 
+  //Only update the user if the user is not in the database or if the user is in the database but is not updated in a delta period of time
   if (
     userFromDB instanceof Error ||
     (!dateNeedsToBeUpdated && userFromDB !== null)
@@ -61,8 +62,8 @@ export async function fetchUserFromGithub(
 export async function displayAllUsersFromDatabase(): Promise<User[] | Error> {
   const users = await getAllUsers();
   if (users instanceof Error) {
-    logger.error('Failed to get users from database');
-    return new Error('Failed to get users from database');
+    logger.error('Failed to display all users from database');
+    return new Error('Failed to display all users from database');
   }
   return users;
 }
@@ -72,8 +73,8 @@ export async function displayUsersByLocation(
 ): Promise<User[] | Error> {
   const users = await getUserByLocation(location);
   if (users instanceof Error) {
-    logger.error('Failed to get users from database');
-    return new Error('Failed to get users from database');
+    logger.error('Failed to display users by location');
+    return new Error('Failed to display users by location');
   }
   return users;
 }
@@ -83,8 +84,8 @@ export async function displayUsersByProgrammingLanguage(
 ): Promise<User[] | Error> {
   const users = await getUserByProgrammingLanguage(programmingLanguage);
   if (users instanceof Error) {
-    logger.error('Failed to get users from database');
-    return new Error('Failed to get users from database');
+    logger.error('Failed to display users by programming language');
+    return new Error('Failed to display users by programming language');
   }
   return users;
 }

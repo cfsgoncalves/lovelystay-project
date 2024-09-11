@@ -5,14 +5,14 @@ import { getProgrammingLanguagesByUsername } from '../../database/programming-la
 
 describe('integration', () => {
   describe('fetchProgrammingLanguagesFromGithub', () => {
-    afterEach(() => {
-      db.none(
-        "DELETE FROM public.user_programming_languages WHERE username LIKE 'cfsgoncalves'",
+    beforeEach(async () => {
+      await db.none('TRUNCATE TABLE users RESTART IDENTITY CASCADE');
+      await db.none(
+        'TRUNCATE TABLE user_programming_languages RESTART IDENTITY CASCADE',
       );
-      db.none("DELETE FROM public.users WHERE username LIKE 'cfsgoncalves'");
     });
 
-    test('happy_path', async () => {
+    test('should return user from the db', async () => {
       const user = await createUser({
         username: 'cfsgoncalves',
         profile_url: 'test',

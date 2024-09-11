@@ -2,18 +2,13 @@ import { createCli } from '../../presentation/cli';
 import { createUser, User } from '../../database/user';
 import { db } from '../../database/database-connection';
 
-describe('cli', () => {
-  describe('e2e', () => {
-    afterEach(() => {
-      db.none(
-        "DELETE FROM public.user_programming_languages WHERE username = 'cfsgoncalves'",
+describe('e2e', () => {
+  describe('cli ', () => {
+    beforeEach(async () => {
+      await db.none('TRUNCATE TABLE users RESTART IDENTITY CASCADE');
+      await db.none(
+        'TRUNCATE TABLE user_programming_languages RESTART IDENTITY CASCADE',
       );
-      db.none(
-        "DELETE FROM public.user_programming_languages WHERE username = 'tchaguitos'",
-      );
-      db.none("DELETE FROM public.users WHERE username = 'cfsgoncalves'");
-      db.none("DELETE FROM public.users WHERE username = 'tgcepeda'");
-      db.none("DELETE FROM public.users WHERE username = 'tchaguitos'");
     });
 
     test('should load user from github', async () => {
@@ -106,7 +101,7 @@ describe('cli', () => {
       );
     });
 
-    test.only('should load user that uses a programming language', async () => {
+    test('should load user that uses a programming language', async () => {
       const result = await createCli({ fetch: 'cfsgoncalves' });
 
       expect((result as User).username).toEqual('cfsgoncalves');
@@ -115,7 +110,7 @@ describe('cli', () => {
 
       expect((result2 as User).username).toEqual('tchaguitos');
 
-      const result3 = await createCli({ language: 'Go' });
+      const result3 = await createCli({ programmingLanguage: 'Go' });
 
       expect((result3 as User[])[0].username).toEqual('cfsgoncalves');
     });
@@ -130,7 +125,7 @@ describe('cli', () => {
       expect((result2 as User).username).toEqual('tchaguitos');
 
       const result3 = await createCli({
-        language: 'Python',
+        programmingLanguage: 'Python',
         location: 'Portugal',
       });
 

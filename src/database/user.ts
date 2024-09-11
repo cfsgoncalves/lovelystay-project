@@ -46,8 +46,9 @@ export async function getUserByLocation(
   try {
     const users = await db.manyOrNone(
       'SELECT username,profile_url,location,repos_url,created_at FROM Users WHERE location LIKE $1',
-      as.format('%' + location + '%'),
+      as.format('%' + location + '%', as.value),
     );
+
     return users;
   } catch (error) {
     logger.error('Failed to get users. Error: ' + error);
