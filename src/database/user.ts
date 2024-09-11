@@ -1,5 +1,6 @@
 import { db } from './database-connection';
 import { logger } from '../utils/logger';
+import { as } from 'pg-promise';
 
 export interface User {
   username: string;
@@ -44,8 +45,8 @@ export async function getUserByLocation(
 ): Promise<User[] | Error> {
   try {
     const users = await db.manyOrNone(
-      'SELECT username,profile_url,location,repos_url,created_at FROM Users WHERE location = $1',
-      location,
+      'SELECT username,profile_url,location,repos_url,created_at FROM Users WHERE location LIKE $1',
+      as.format('%' + location + '%'),
     );
     return users;
   } catch (error) {

@@ -12,7 +12,6 @@ import { logger } from '../utils/logger';
 export async function fetchUserFromGithub(
   username: string,
 ): Promise<User | Error> {
-  // Add timestamp for user to refresh data
   const userFromDB: User | Error = await getUserByUsername(username);
 
   const TIME_TO_REFRESH = Number(env.TIME_TO_REFRESH) || 86400000; // 1 day

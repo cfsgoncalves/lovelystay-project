@@ -4,14 +4,14 @@ import { createUser } from '../../database/user';
 import { getProgrammingLanguagesByUsername } from '../../database/programming-languages';
 
 describe('integration', () => {
-  afterEach(() => {
-    db.none(
-      "DELETE FROM public.user_programming_languages WHERE username LIKE 'cfsgoncalves'",
-    );
-    db.none("DELETE FROM public.users WHERE username LIKE 'cfsgoncalves'");
-  });
-
   describe('fetchProgrammingLanguagesFromGithub', () => {
+    afterEach(() => {
+      db.none(
+        "DELETE FROM public.user_programming_languages WHERE username LIKE 'cfsgoncalves'",
+      );
+      db.none("DELETE FROM public.users WHERE username LIKE 'cfsgoncalves'");
+    });
+
     test('happy_path', async () => {
       const user = await createUser({
         username: 'cfsgoncalves',

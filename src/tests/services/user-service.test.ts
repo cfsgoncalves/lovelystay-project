@@ -7,11 +7,12 @@ import { createUser, getUserByUsername, User } from '../../database/user';
 import * as moduleUser from '../../database/user';
 
 describe('integration', () => {
-  afterEach(() => {
-    db.none("DELETE FROM public.users WHERE username = 'cfsgoncalves'");
-  });
-
   describe('fetchUserFromGithub', () => {
+    afterEach(() => {
+      db.none("DELETE FROM public.users WHERE username = 'fooo'");
+      db.none("DELETE FROM public.users WHERE username = 'cfsgoncalves'");
+    });
+
     test('happy_path', async () => {
       const user: User | Error = await fetchUserFromGithub('cfsgoncalves');
 

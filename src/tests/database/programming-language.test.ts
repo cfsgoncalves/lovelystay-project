@@ -1,17 +1,16 @@
-
 import { db } from '../../database/database-connection';
 import { createUser } from '../../database/user';
 import { createProgrammingLanguageIfNotExists } from '../../database/programming-languages';
 
 describe('integration', () => {
-  afterEach(() => {
-    db.none(
-      "DELETE FROM public.user_programming_languages WHERE username LIKE 'test%'",
-    );
-    db.none("DELETE FROM public.users WHERE username LIKE 'test%'");
-  });
-
   describe('createProgrammingLanguageIfNotExists', () => {
+    afterEach(() => {
+      db.none(
+        "DELETE FROM public.user_programming_languages WHERE username LIKE 'test%'",
+      );
+      db.none("DELETE FROM public.users WHERE username LIKE 'test%'");
+    });
+
     test('should insert into multiple programming languages', async () => {
       const user = await createUser({
         username: 'test',

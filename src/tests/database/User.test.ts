@@ -6,11 +6,11 @@ import {
 } from '../../database/user';
 
 describe('integration', () => {
-  afterEach(() => {
-    db.none("DELETE FROM public.users WHERE username LIKE 'test%'");
-  });
-
   describe('createUser', () => {
+    afterEach(() => {
+      db.none("DELETE FROM public.users WHERE username LIKE 'test%'");
+    });
+
     test('should create a user', async () => {
       const user = {
         username: 'test',

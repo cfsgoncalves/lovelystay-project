@@ -10,7 +10,8 @@ const migrations = Promise.resolve(startMigrations()).catch((error) => {
 
 migrations
   .then(async () => {
-    createCli();
+    const displayUsers = await createCli();
+    console.log(displayUsers);
   })
   .catch((error) => {
     logger.error('Failed to start migrations' + error);

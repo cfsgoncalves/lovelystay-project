@@ -1,4 +1,4 @@
-import { Command } from 'commander';
+import { Command, OptionValues } from 'commander';
 import {
   displayAllUsersFromDatabase,
   displayUsersByLocation,
@@ -7,10 +7,10 @@ import {
 } from '../services/user-service';
 import { logger } from '../utils/logger';
 import { fetchProgrammingLanguagesFromGithub } from '../services/programming-language-service';
-import { User } from '../database/user';
 
-export async function createCli() {
+export async function createCli(optionsValue?: OptionValues) {
   const program = new Command();
+  let options = optionsValue;
 
   program
     .option('-f, --fetch <username>', 'fetch user from github')
@@ -26,44 +26,48 @@ export async function createCli() {
 
   program.parse(process.argv);
 
-  const options = program.opts();
+  console.log('Options Value: ' + JSON.stringify(program.opts()));
 
-  if (options.fetch) {
-    logger.debug(`fetching user from github: ${options.fetch}`);
-    return Promise.all([
-      fetchUserFromGithub(options.fetch),
-      fetchProgrammingLanguagesFromGithub(options.fetch),
+  if (!optionsValue) {
+    options = program.opts();
+  }
+
+  if (options!.fetch) {
+    logger.debug(`fetching user from github: ${options!.fetch}`);
+    const [user] = await Promise.all([
+      fetchUserFromGithub(options!.fetch),
+      fetchProgrammingLanguagesFromGithub(options!.fetch),
     ]);
+    return user;
   }
 
-  if (options.displayAll) {
-    logger.debug(`displaying user from database: ${options.displayAll}`);
-    return displayAllUsersFromDatabase().then((users) => {
-      console.log(`Displaying all the users on the database:`);
-      console.log(users)
-    });
+  if (options!.displayAll) {
+    logger.debug(`displaying user from database: ${options!.displayAll}`);
+    const users = await displayAllUsersFromDatabase();
+    return users;
   }
 
-  if(options.location && options.programmingLanguage) {
-    logger.debug(`fetching user from location: ${options.location} and programming language: ${options.programmingLanguage}`);
-    return
+  if (options!.location && options!.programmingLanguage) {
+    logger.debug(
+      `fetching user from location: ${options!.location} and programming language: ${options!.programmingLanguage}`,
+    );
+    const users = await displayUsersByLocation(options!.location);
+    return users;
   }
 
-  if (options.location) {
-    logger.debug(`fetching user from location: ${options.location}`);
-    return displayUsersByLocation(options.location).then((users) => {
-      console.log(`Displaying all the users from the location ${options.location} are: \n`);
-      console.log(users);
-    });
+  if (options!.location) {
+    logger.debug(`fetching user from location: ${options!.location}`);
+    const users = displayUsersByLocation(options!.location);
+    return users;
   }
 
-  if (options.programmingLanguage) {
-    logger.debug("fetching user by programming language: " + options.programmingLanguage);
-    return displayUsersByProgrammingLanguage(
-      options.programmingLanguage,
-    ).then((users) => {
-      console.log(`Displaying all the for the programming language ${options.programmingLanguage} are: \n`);
-      console.log(users);
-    });
+  if (options!.programmingLanguage) {
+    logger.debug(
+      'fetching user by programming language: ' + options!.programmingLanguage,
+    );
+    const users = displayUsersByProgrammingLanguage(
+      options!.programmingLanguage,
+    );
+    return users;
   }
 }
