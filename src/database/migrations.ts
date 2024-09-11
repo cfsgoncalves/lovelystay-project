@@ -2,7 +2,7 @@ import { migrate } from 'postgres-migrations';
 import { env } from 'node:process';
 import { logger } from '../utils/logger';
 
-export async function startMigrations() {
+export async function startMigrations(): Promise<void> {
   if (
     env.DB_NAME === undefined ||
     env.DB_USER === undefined ||
@@ -20,14 +20,14 @@ export async function startMigrations() {
     host: env.DB_HOST,
     port: parseInt(env.DB_PORT),
     defaultDatabase: 'postgres',
-    ensureDatabaseExists: true
+    ensureDatabaseExists: true,
   };
 
-    Promise.all([
-      migrate(dbConfig, 'src/database/migrations'),
-    ]).then(() => {
+  return Promise.all([migrate(dbConfig, 'src/database/migrations')])
+    .then(() => {
       logger.info('Migrations ran successfully');
-    }).catch((error) => {
-        logger.error('Error running migrations: ' +  error.message);
+    })
+    .catch((error) => {
+      logger.error('Error running migrations: ' + error.message);
     });
 }
