@@ -24,14 +24,15 @@ export async function createCli(optionsValue?: OptionValues) {
       'query the users by programming language',
     );
 
-  program.parse(process.argv);
-
   if (!optionsValue) {
     options = program.opts();
   }
 
+  program.parse();
+
   if (options!.fetch) {
     logger.debug(`fetching user from github: ${options!.fetch}`);
+
     const [user] = await Promise.all([
       fetchUserFromGithub(options!.fetch),
       fetchProgrammingLanguagesFromGithub(options!.fetch),

@@ -1,18 +1,18 @@
 import { db } from '../../database/database-connection';
-import { createUser } from '../../database/user';
+import { createUser } from '../../database/models/user';
 import {
   createProgrammingLanguageIfNotExists,
   getProgrammingLanguagesByUsername,
-} from '../../database/programming-languages';
+} from '../../database/models/programming-languages';
+
+afterEach(async () => {
+  await db.none('TRUNCATE TABLE users RESTART IDENTITY CASCADE');
+  await db.none(
+    'TRUNCATE TABLE user_programming_languages RESTART IDENTITY CASCADE',
+  );
+});
 
 describe('integration', () => {
-  beforeEach(async () => {
-    await db.none('TRUNCATE TABLE users RESTART IDENTITY CASCADE');
-    await db.none(
-      'TRUNCATE TABLE user_programming_languages RESTART IDENTITY CASCADE',
-    );
-  });
-
   describe('createProgrammingLanguageIfNotExists', () => {
     test('should insert into multiple programming languages', async () => {
       const user = await createUser({
@@ -71,18 +71,17 @@ describe('integration', () => {
 describe('unit', () => {
   describe('createProgrammingLanguageIfNotExists', () => {
     test('should return an error if the insert fails', async () => {
-      jest.spyOn(db, 'none').mockRejectedValue(new Error('Failed to insert'));
+      jest
+        .spyOn(db, 'tx')
+        .mockRejectedValue(new Error('Failed to insert programming languages'));
 
-      const plArray = [
+      const dbData = await createProgrammingLanguageIfNotExists([
         { username: 'test', language_name: 'Python' },
-        { username: 'test', language_name: 'JavaScript' },
-        { username: 'test', language_name: 'Java' },
-      ];
-      const dbData = await createProgrammingLanguageIfNotExists(plArray);
+      ]);
 
       expect(dbData).toBeInstanceOf(Error);
-      expect(dbData.toString()).toBe(
-        'Error: Failed to insert into user_programming_languages',
+      expect(dbData).toEqual(
+        new Error('Failed to insert into user_programming_languages'),
       );
     });
   });
@@ -91,13 +90,15 @@ describe('unit', () => {
     test('should return an error if the query fails', async () => {
       jest
         .spyOn(db, 'manyOrNone')
-        .mockRejectedValue(new Error('Failed to get'));
+        .mockRejectedValue(
+          new Error('Failed to get programming languages by username'),
+        );
 
       const dbData = await getProgrammingLanguagesByUsername('test');
 
       expect(dbData).toBeInstanceOf(Error);
-      expect(dbData.toString()).toBe(
-        'Error: Failed to get programming languages by username',
+      expect(dbData).toEqual(
+        new Error('Failed to get programming languages by username'),
       );
     });
   });

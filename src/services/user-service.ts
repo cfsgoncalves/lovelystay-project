@@ -6,7 +6,7 @@ import {
   getUserByLocation,
   getUserByUsername,
   getUserByProgrammingLanguage,
-} from '../database/user';
+} from '../database/models/user';
 import { logger } from '../utils/logger';
 
 export async function fetchUserFromGithub(

@@ -1,17 +1,17 @@
-import { db } from '../../database/database-connection';
 import { fetchProgrammingLanguagesFromGithub } from '../../services/programming-language-service';
-import { createUser } from '../../database/user';
-import { getProgrammingLanguagesByUsername } from '../../database/programming-languages';
+import { createUser } from '../../database/models/user';
+import { getProgrammingLanguagesByUsername } from '../../database/models/programming-languages';
+import { db } from '../../database/database-connection';
+
+afterEach(async () => {
+  await db.none('TRUNCATE TABLE users RESTART IDENTITY CASCADE');
+  await db.none(
+    'TRUNCATE TABLE user_programming_languages RESTART IDENTITY CASCADE',
+  );
+});
 
 describe('integration', () => {
   describe('fetchProgrammingLanguagesFromGithub', () => {
-    beforeEach(async () => {
-      await db.none('TRUNCATE TABLE users RESTART IDENTITY CASCADE');
-      await db.none(
-        'TRUNCATE TABLE user_programming_languages RESTART IDENTITY CASCADE',
-      );
-    });
-
     test('should return user from the db', async () => {
       const user = await createUser({
         username: 'cfsgoncalves',

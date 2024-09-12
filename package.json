@@ -41,7 +41,7 @@
   "main": "./dist/server.js",
   "scripts": {
     "build": "tsc",
-    "test": "jest --coverage",
+    "test": "jest --runInBand --coverage ./src/tests/database/ ./src/tests/services && jest ./src/tests/presentation",
     "start": "node ./dist/app.js",
     "lint": "eslint ./src/*.ts",
     "lint:fix": "eslint . --fix",

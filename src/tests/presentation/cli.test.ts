@@ -1,16 +1,16 @@
 import { createCli } from '../../presentation/cli';
-import { createUser, User } from '../../database/user';
+import { createUser, User } from '../../database/models/user';
 import { db } from '../../database/database-connection';
+
+afterEach(async () => {
+  await db.none('TRUNCATE TABLE users RESTART IDENTITY CASCADE');
+  await db.none(
+    'TRUNCATE TABLE user_programming_languages RESTART IDENTITY CASCADE',
+  );
+});
 
 describe('e2e', () => {
   describe('cli ', () => {
-    beforeEach(async () => {
-      await db.none('TRUNCATE TABLE users RESTART IDENTITY CASCADE');
-      await db.none(
-        'TRUNCATE TABLE user_programming_languages RESTART IDENTITY CASCADE',
-      );
-    });
-
     test('should load user from github', async () => {
       const result = await createCli({ fetch: 'cfsgoncalves' });
 

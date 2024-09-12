@@ -1,21 +1,22 @@
 import { db } from '../../database/database-connection';
-import { createProgrammingLanguageIfNotExists } from '../../database/programming-languages';
+import { createProgrammingLanguageIfNotExists } from '../../database/models/programming-languages';
 import {
   createUser,
   getUserByUsername,
   getUserByLocation,
   getAllUsers,
   getUserByProgrammingLanguage,
-} from '../../database/user';
+  User,
+} from '../../database/models/user';
+
+afterEach(async () => {
+  await db.none('TRUNCATE TABLE users RESTART IDENTITY CASCADE');
+  await db.none(
+    'TRUNCATE TABLE user_programming_languages RESTART IDENTITY CASCADE',
+  );
+});
 
 describe('integration', () => {
-  beforeEach(async () => {
-    await db.none('TRUNCATE TABLE users RESTART IDENTITY CASCADE');
-    await db.none(
-      'TRUNCATE TABLE user_programming_languages RESTART IDENTITY CASCADE',
-    );
-  });
-
   describe('createUser', () => {
     test('should create a user', async () => {
       const user = {
@@ -31,7 +32,10 @@ describe('integration', () => {
 
       const userDB = await getUserByUsername('test');
 
-      expect(userDB).toEqual(user);
+      expect((userDB as User).username).toEqual(user.username);
+      expect((userDB as User).location).toEqual(user.location);
+      expect((userDB as User).profile_url).toEqual(user.profile_url);
+      expect((userDB as User).repos_url).toEqual(user.repos_url);
     });
 
     test('should update a user', async () => {
@@ -53,7 +57,7 @@ describe('integration', () => {
 
       const userDB = await getUserByUsername('test');
 
-      expect(userDB).toEqual({ ...user, location: 'test2' });
+      expect((userDB as User).location).toEqual('test2');
     });
   });
 

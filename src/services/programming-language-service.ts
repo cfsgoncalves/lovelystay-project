@@ -1,11 +1,12 @@
-import { createProgrammingLanguageIfNotExists } from '../database/programming-languages';
+import { createProgrammingLanguageIfNotExists } from '../database/models/programming-languages';
 import { logger } from '../utils/logger';
-import { ProgrammingLanguage } from '../database/programming-languages';
+import { ProgrammingLanguage } from '../database/models/programming-languages';
 
 export async function fetchProgrammingLanguagesFromGithub(
   username: string,
 ): Promise<ProgrammingLanguage[] | Error> {
-  //Need to add the logic to update the programming only after a period of time
+  //If api calls become expensive, either in money or in rate limits, we can use the same logic that
+  //we used in fetchUserFromGithub to only fetch the values if a delta has passed since the last time we fetched the values
   const programmingLanguages = new Set<string>();
 
   const githubUserUrl = process.env.GITHUB_USER_URL;

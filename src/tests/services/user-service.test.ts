@@ -5,18 +5,22 @@ import {
   fetchUserFromGithub,
 } from '../../services/user-service';
 import { db } from '../../database/database-connection';
-import { createUser, getUserByUsername, User } from '../../database/user';
-import * as moduleUser from '../../database/user';
+import {
+  createUser,
+  getUserByUsername,
+  User,
+} from '../../database/models/user';
+import * as moduleUser from '../../database/models/user';
+
+afterEach(async () => {
+  await db.none('TRUNCATE TABLE users RESTART IDENTITY CASCADE');
+  await db.none(
+    'TRUNCATE TABLE user_programming_languages RESTART IDENTITY CASCADE',
+  );
+});
 
 describe('integration', () => {
   describe('fetchUserFromGithub', () => {
-    beforeEach(async () => {
-      await db.none('TRUNCATE TABLE users RESTART IDENTITY CASCADE');
-      await db.none(
-        'TRUNCATE TABLE user_programming_languages RESTART IDENTITY CASCADE',
-      );
-    });
-
     test('happy_path', async () => {
       const user: User | Error = await fetchUserFromGithub('cfsgoncalves');
 
@@ -92,7 +96,7 @@ describe('integration', () => {
   });
 
   describe('displayAllUsersFromDatabase', () => {
-    beforeEach(async () => {
+    afterEach(async () => {
       await db.none('TRUNCATE TABLE users RESTART IDENTITY CASCADE');
       await db.none(
         'TRUNCATE TABLE user_programming_languages RESTART IDENTITY CASCADE',

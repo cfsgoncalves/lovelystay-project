@@ -1,5 +1,5 @@
-import { db } from './database-connection';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
+import { db } from '../database-connection';
 import { as } from 'pg-promise';
 
 export interface User {

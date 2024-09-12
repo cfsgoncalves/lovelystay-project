@@ -1,5 +1,5 @@
-import { logger } from '../utils/logger';
-import { db, pgp } from './database-connection';
+import { logger } from '../../utils/logger';
+import { db, pgp } from '../database-connection';
 
 export interface ProgrammingLanguage {
   username: string;
