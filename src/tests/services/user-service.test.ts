@@ -2,7 +2,7 @@ import {
   displayAllUsersFromDatabase,
   displayUsersByLocation,
   displayUsersByProgrammingLanguage,
-  fetchUserFromGithub,
+  fetchOrUpdateUserFromGithub,
 } from '../../services/user-service';
 import { db } from '../../database/database-connection';
 import {
@@ -20,9 +20,10 @@ afterEach(async () => {
 });
 
 describe('integration', () => {
-  describe('fetchUserFromGithub', () => {
+  describe('fetchOrUpdateUserFromGithub', () => {
     test('happy_path', async () => {
-      const user: User | Error = await fetchUserFromGithub('cfsgoncalves');
+      const user: User | Error =
+        await fetchOrUpdateUserFromGithub('cfsgoncalves');
 
       expect((user as User).username).toContain('cfsgoncalves');
       expect((user as User).location).toContain('Guimarães, Portugal');
@@ -48,7 +49,7 @@ describe('integration', () => {
         username: 'cfsgoncalves',
         profile_url: 'fooo',
         location: 'barr',
-        repos_url: 'sss',
+        repos_url: 'https://api.github.com/users/cfsgoncalves/repos',
         created_at: new Date(),
       });
 
@@ -56,7 +57,8 @@ describe('integration', () => {
 
       jest.spyOn(moduleUser, 'createUser');
 
-      const user: User | Error = await fetchUserFromGithub('cfsgoncalves');
+      const user: User | Error =
+        await fetchOrUpdateUserFromGithub('cfsgoncalves');
 
       expect((user as User).username).toContain('cfsgoncalves');
 
@@ -68,18 +70,19 @@ describe('integration', () => {
 
       const dbUser = await moduleUser.createUser({
         username: 'cfsgoncalves',
-        profile_url: 'fooo',
+        profile_url: 'https://github.com/cfsgoncalves',
         location: 'barr',
-        repos_url: 'sss',
+        repos_url: 'https://api.github.com/users/cfsgoncalves/repos',
         created_at: new Date('2021-01-01'),
       });
 
       expect(dbUser).toEqual({ username: 'cfsgoncalves' });
 
-      const user: User | Error = await fetchUserFromGithub('cfsgoncalves');
+      const user: User | Error =
+        await fetchOrUpdateUserFromGithub('cfsgoncalves');
 
       expect((user as User).username).toContain('cfsgoncalves');
-      expect((user as User).location).toContain('Guimarães, Portugal');
+      expect((user as User).location).toContain('barr');
       expect((user as User).profile_url).toContain(
         'https://github.com/cfsgoncalves',
       );
@@ -96,19 +99,12 @@ describe('integration', () => {
   });
 
   describe('displayAllUsersFromDatabase', () => {
-    afterEach(async () => {
-      await db.none('TRUNCATE TABLE users RESTART IDENTITY CASCADE');
-      await db.none(
-        'TRUNCATE TABLE user_programming_languages RESTART IDENTITY CASCADE',
-      );
-    });
-
     test('happy_path', async () => {
       const user1 = await createUser({
         username: 'cfsgoncalves',
         profile_url: 'test',
         location: 'test',
-        repos_url: 'test',
+        repos_url: 'https://api.github.com/users/cfsgoncalves/repos',
         created_at: new Date(),
       });
 
@@ -118,7 +114,7 @@ describe('integration', () => {
         username: 'fooo',
         profile_url: 'test',
         location: 'test',
-        repos_url: 'test',
+        repos_url: 'https://api.github.com/users/cfsgoncalves/repos',
         created_at: new Date(),
       });
 
@@ -133,7 +129,7 @@ describe('integration', () => {
 });
 
 describe('unit', () => {
-  describe('fetchUserFromGithub', () => {
+  describe('fetchOrUpdateUserFromGithub', () => {
     test('should return user', async () => {});
 
     test('failed_fetch', async () => {});

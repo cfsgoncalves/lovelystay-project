@@ -1,5 +1,6 @@
 import { logger } from '../../utils/logger';
 import { db, pgp } from '../database-connection';
+import z from 'zod';
 
 export interface ProgrammingLanguage {
   username: string;
@@ -9,7 +10,14 @@ export interface ProgrammingLanguage {
 export async function createProgrammingLanguageIfNotExists(
   pl: ProgrammingLanguage[],
 ): Promise<ProgrammingLanguage[] | Error> {
+  const programmingLanguageSchema = z.object({
+    username: z.string(),
+    language_name: z.string(),
+  });
+
   try {
+    z.array(programmingLanguageSchema).parse(pl);
+
     const { ColumnSet, insert } = pgp.helpers;
     const cs = new ColumnSet(['username', 'language_name'], {
       table: 'user_programming_languages',
@@ -29,9 +37,13 @@ export async function createProgrammingLanguageIfNotExists(
 export async function getProgrammingLanguagesByUsername(
   username: string,
 ): Promise<ProgrammingLanguage[] | Error> {
+  const usernameSchema = z.string();
+
   try {
+    usernameSchema.parse(username);
+
     const pl = await db.manyOrNone(
-      'SELECT * FROM user_programming_languages WHERE username = $1',
+      'SELECT username, language_name FROM user_programming_languages WHERE username = $1',
       username,
     );
     return pl;

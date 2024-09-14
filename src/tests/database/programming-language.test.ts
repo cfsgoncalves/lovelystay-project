@@ -19,7 +19,7 @@ describe('integration', () => {
         username: 'test',
         profile_url: 'test',
         location: 'test',
-        repos_url: 'test',
+        repos_url: 'https://api.github.com/users/test/repos',
         created_at: new Date(),
       });
 
@@ -45,7 +45,7 @@ describe('integration', () => {
         username: 'test',
         profile_url: 'test',
         location: 'test',
-        repos_url: 'test',
+        repos_url: 'https://api.github.com/users/test/repos',
         created_at: new Date(),
       });
 

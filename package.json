@@ -16,7 +16,8 @@
     "pino": "^9.3.2",
     "postgres-migrations": "^5.3.0",
     "roarr": "^7.21.1",
-    "typescript-eslint": "^8.3.0"
+    "typescript-eslint": "^8.3.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",
@@ -42,6 +43,7 @@
   "scripts": {
     "build": "tsc",
     "test": "jest --runInBand --coverage ./src/tests/database/ ./src/tests/services && jest ./src/tests/presentation",
+    "testone": "jest",
     "start": "node ./dist/app.js",
     "lint": "eslint ./src/*.ts",
     "lint:fix": "eslint . --fix",
@@ -50,5 +52,9 @@
   },
   "bin": {
     "lovelystay-project": "./bin/run.js"
+  },
+  "engines": {
+    "npm": ">=10.0.0",
+    "node": ">=v22.0.0"
   }
 }

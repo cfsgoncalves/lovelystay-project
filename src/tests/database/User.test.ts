@@ -23,7 +23,7 @@ describe('integration', () => {
         username: 'test',
         profile_url: 'test',
         location: 'test',
-        repos_url: 'test',
+        repos_url: 'https://api.github.com/users/test/repos',
         created_at: new Date(),
       };
       const result = await createUser(user);
@@ -43,7 +43,7 @@ describe('integration', () => {
         username: 'test',
         profile_url: 'test',
         location: 'test',
-        repos_url: 'test',
+        repos_url: 'https://api.github.com/users/test/repos',
         created_at: new Date(),
       };
 
@@ -67,7 +67,7 @@ describe('integration', () => {
         username: 'test3',
         profile_url: 'test',
         location: 'PT',
-        repos_url: 'test',
+        repos_url: 'https://api.github.com/users/test/repos',
         created_at: new Date(),
       };
 
@@ -75,7 +75,7 @@ describe('integration', () => {
         username: 'test2',
         profile_url: 'test',
         location: 'ENG',
-        repos_url: 'test',
+        repos_url: 'https://api.github.com/users/test2/repos',
         created_at: new Date(),
       };
 
@@ -99,7 +99,7 @@ describe('integration', () => {
         username: 'test',
         profile_url: 'test',
         location: 'PT',
-        repos_url: 'test',
+        repos_url: 'https://api.github.com/users/test/repos',
         created_at: new Date(),
       };
 
@@ -107,7 +107,7 @@ describe('integration', () => {
         username: 'test2',
         profile_url: 'test',
         location: 'ENG',
-        repos_url: 'test',
+        repos_url: 'https://api.github.com/users/test2/repos',
         created_at: new Date(),
       };
 
@@ -131,7 +131,7 @@ describe('integration', () => {
         username: 'test',
         profile_url: 'test',
         location: 'PT',
-        repos_url: 'test',
+        repos_url: 'https://api.github.com/users/test/repos',
         created_at: new Date(),
       };
 
@@ -139,7 +139,7 @@ describe('integration', () => {
         username: 'test1',
         profile_url: 'test',
         location: 'ENG',
-        repos_url: 'test',
+        repos_url: 'https://api.github.com/users/test1/repos',
         created_at: new Date(),
       };
 
@@ -188,7 +188,7 @@ describe('unit', () => {
         username: 'test',
         profile_url: 'test',
         location: 'test',
-        repos_url: 'test',
+        repos_url: 'https://api.github.com/users/test/repos',
         created_at: new Date(),
       };
 

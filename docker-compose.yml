@@ -4,8 +4,8 @@ services:
     ports:
       - 5432:5432
     environment:
-      POSTGRES_USER: lovelystay
-      POSTGRES_PASSWORD: lovelystay
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     networks:
       - lovelystay
 

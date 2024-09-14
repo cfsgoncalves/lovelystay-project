@@ -6,26 +6,21 @@ import {
   getUserByLocation,
   getUserByUsername,
   getUserByProgrammingLanguage,
+  getUserByLocationAndProgrammingLanguage,
 } from '../database/models/user';
 import { logger } from '../utils/logger';
 
-export async function fetchUserFromGithub(
+export async function fetchOrUpdateUserFromGithub(
   username: string,
 ): Promise<User | Error> {
-  const userFromDB: User | Error = await getUserByUsername(username);
+  const userUpdateStatus = await isUserUpdated(username);
 
-  const TIME_TO_REFRESH = Number(env.TIME_TO_REFRESH) || 86400000; // 1 day
+  if (userUpdateStatus instanceof Error) {
+    return new Error('Failed to get user from database');
+  }
 
-  const dateNeedsToBeUpdated =
-    new Date(Date.now() - TIME_TO_REFRESH) >=
-    new Date((userFromDB as User)?.created_at);
-
-  //Only update the user if the user is not in the database or if the user is in the database but is not updated in a delta period of time
-  if (
-    userFromDB instanceof Error ||
-    (!dateNeedsToBeUpdated && userFromDB !== null)
-  ) {
-    return userFromDB;
+  if (!(userUpdateStatus instanceof Error) && userUpdateStatus !== undefined) {
+    return userUpdateStatus;
   }
 
   const githubUserUrl = env.GITHUB_USER_URL;
@@ -59,6 +54,28 @@ export async function fetchUserFromGithub(
   return user;
 }
 
+export async function isUserUpdated(
+  username: string,
+): Promise<User | Error | undefined> {
+  const userFromDB: User | Error = await getUserByUsername(username);
+
+  const TIME_TO_REFRESH = Number(env.TIME_TO_REFRESH!); // 1 day
+
+  const dateNeedsToBeUpdated =
+    new Date(Date.now() - TIME_TO_REFRESH) >=
+    new Date((userFromDB as User)?.created_at);
+
+  //Only update the user if the user is not in the database or if the user is in the database but is not updated in a delta period of time
+  if (
+    userFromDB instanceof Error ||
+    (!dateNeedsToBeUpdated && userFromDB !== null)
+  ) {
+    return userFromDB;
+  }
+
+  return undefined;
+}
+
 export async function displayAllUsersFromDatabase(): Promise<User[] | Error> {
   const users = await getAllUsers();
   if (users instanceof Error) {
@@ -88,4 +105,18 @@ export async function displayUsersByProgrammingLanguage(
     return new Error('Failed to display users by programming language');
   }
   return users;
+}
+
+export async function displaUserByLocationAndProgrammingLanguage(
+  username: string,
+  pl: string,
+): Promise<User[] | Error> {
+  const user = await getUserByLocationAndProgrammingLanguage(username, pl);
+  if (user instanceof Error) {
+    logger.error('Failed to display user by location and programming language');
+    return new Error(
+      'Failed to display user by location and programming language',
+    );
+  }
+  return user;
 }

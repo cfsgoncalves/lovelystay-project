@@ -1,5 +1,6 @@
 import { createCli } from '../../presentation/cli';
 import { createUser, User } from '../../database/models/user';
+import { UserWithProgrammingLanguages } from '../../services/programming-language-service';
 import { db } from '../../database/database-connection';
 
 afterEach(async () => {
@@ -52,7 +53,7 @@ describe('e2e', () => {
         username: 'cfsgoncalves',
         profile_url: 'test',
         location: 'test',
-        repos_url: 'test',
+        repos_url: 'https://api.github.com/users/cfsgoncalves/repos',
         created_at: new Date('2024-09-11T21:29:06.362Z'),
       });
 
@@ -63,7 +64,9 @@ describe('e2e', () => {
       expect((result as User[])[0].username).toEqual('cfsgoncalves');
       expect((result as User[])[0].location).toEqual('test');
       expect((result as User[])[0].profile_url).toEqual('test');
-      expect((result as User[])[0].repos_url).toEqual('test');
+      expect((result as User[])[0].repos_url).toEqual(
+        'https://api.github.com/users/cfsgoncalves/repos',
+      );
       expect((result as User[])[0].created_at).toEqual(
         new Date('2024-09-11T21:29:06.362Z'),
       );
@@ -74,7 +77,7 @@ describe('e2e', () => {
         username: 'cfsgoncalves',
         profile_url: 'test',
         location: 'Guimarães, Portugal',
-        repos_url: 'test',
+        repos_url: 'https://api.github.com/users/cfsgoncalves/repos',
         created_at: new Date('2024-09-11T21:29:06.362Z'),
       });
 
@@ -84,7 +87,7 @@ describe('e2e', () => {
         username: 'tgcepeda',
         profile_url: 'test',
         location: 'Paris, France',
-        repos_url: 'test',
+        repos_url: 'https://api.github.com/users/cfsgoncalves/repos',
         created_at: new Date('2024-09-11T21:29:06.362Z'),
       });
 
@@ -95,7 +98,9 @@ describe('e2e', () => {
       expect((result as User[])[0].username).toEqual('cfsgoncalves');
       expect((result as User[])[0].location).toEqual('Guimarães, Portugal');
       expect((result as User[])[0].profile_url).toEqual('test');
-      expect((result as User[])[0].repos_url).toEqual('test');
+      expect((result as User[])[0].repos_url).toEqual(
+        'https://api.github.com/users/cfsgoncalves/repos',
+      );
       expect((result as User[])[0].created_at).toEqual(
         new Date('2024-09-11T21:29:06.362Z'),
       );
@@ -130,6 +135,20 @@ describe('e2e', () => {
       });
 
       expect((result3 as User[])[0].username).toEqual('cfsgoncalves');
+    });
+
+    test('should load users details given an username', async () => {
+      const result = await createCli({ fetch: 'cfsgoncalves' });
+
+      expect((result as User).username).toEqual('cfsgoncalves');
+
+      const result2 = await createCli({
+        showProgrammingLanguages: 'cfsgoncalves',
+      });
+
+      expect((result2 as UserWithProgrammingLanguages).username).toEqual(
+        'cfsgoncalves',
+      );
     });
   });
 });
