@@ -131,3 +131,9 @@ In terms of the next steps, I would add `Prometheus` metrics and spin up `grafan
 
 - [DONE] The function fetchUserFromGithub does not follow the single responsibility principle, it's doing way more than just fetch the GitHub user -> Change the name of function to `fetchOrUpdateUserFromGithub` and added a second one `isUserUpdated` to do the logic of deciding if a user needs to be updated.
 
+## TODO
+
+- [ ] Change application to rest endpoints or to receive remote command calls
+- [ ] Containerise application
+- [ ] Add prometheous metrics
+- [ ] Add dashboards
